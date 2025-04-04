@@ -15,10 +15,10 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: MyProject.sln  # 🔹 Replace with your actual solution file name
-      Test_Project_Path: MyProject.Tests/MyProject.Tests.csproj  # 🔹 Replace with your test project path
-      Wap_Project_Directory: MyProject.Package  # 🔹 Replace with your WAP project directory
-      Wap_Project_Path: MyProject.Package/MyProject.Package.wapproj  # 🔹 Replace with your WAP project path
+      Solution_Name: MyProject.sln  # 🔹 Replace with actual solution file
+      Test_Project_Path: MyProject.Tests/MyProject.Tests.csproj  # 🔹 Replace with actual test project path
+      Wap_Project_Directory: MyProject.Package  # 🔹 Replace with actual WAP directory
+      Wap_Project_Path: MyProject.Package/MyProject.Package.wapproj  # 🔹 Replace with actual WAP project path
 
     steps:
     - name: Checkout Repository
@@ -27,7 +27,7 @@ jobs:
         fetch-depth: 0
 
     - name: Debug - List Files in Repo
-      run: ls -R  # 🔹 This helps verify that the solution file exists
+      run: ls -R  # 🔹 Check if solution and test project files exist
 
     # Install .NET SDK
     - name: Install .NET Core SDK
@@ -39,15 +39,21 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-    # Run Unit Tests
-    - name: Run Unit Tests
-      run: dotnet test ${{ env.Test_Project_Path }}
-
     # Restore Dependencies
     - name: Restore the Application
       run: dotnet restore ${{ env.Solution_Name }}
       env:
         Configuration: ${{ matrix.configuration }}
+
+    # Run Unit Tests (with check for missing file)
+    - name: Run Unit Tests
+      run: |
+        if [ -f "${{ env.Test_Project_Path }}" ]; then
+          dotnet test ${{ env.Test_Project_Path }}
+        else
+          echo "❌ Test project file not found: ${{ env.Test_Project_Path }}"
+          exit 1
+        fi
 
     # Decode the Base64-encoded PFX certificate
     - name: Decode the PFX Certificate
@@ -65,7 +71,7 @@ jobs:
         Appx_Package_Build_Mode: StoreUpload
         Configuration: ${{ matrix.configuration }}
 
-    # Remove the PFX Certificate After Use
+    # Remove PFX Certificate After Use
     - name: Remove PFX Certificate
       run: Remove-Item -Path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
 
