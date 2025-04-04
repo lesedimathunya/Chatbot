@@ -37,17 +37,23 @@ jobs:
       run: dotnet test
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /v:detailed # Added verbose logging
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /bl:restore.binlog # Create binary log
       env:
         Configuration: ${{ matrix.configuration }}
 
     - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /v:detailed # Added verbose logging
+      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /bl:package.binlog # Create binary log
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x86|x64
         Appx_Package_Build_Mode: StoreUpload
         Configuration: ${{ matrix.configuration }}
+
+    - name: Upload build logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: BuildLogs
+        path: "*.binlog" # Upload binary logs
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
