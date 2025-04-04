@@ -16,8 +16,8 @@ jobs:
 
     env:
       Solution_Name: Chatbot.sln
-      Wap_Project_Path: ./Chatbot/Chatbot.Package/Chatbot.Package.wapproj # Replace with your actual path!
-      Wap_Project_Directory: ./Chatbot/Chatbot.Package/ # Replace with your actual path!
+      Wap_Project_Path: ./Chatbot/Chatbot.Package/Chatbot.Package.wapproj
+      Wap_Project_Directory: ./Chatbot/Chatbot.Package/
 
     steps:
     - name: Checkout
@@ -37,12 +37,12 @@ jobs:
       run: dotnet test
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /bl:restore.binlog # Create binary log
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /bl:restore.binlog
       env:
         Configuration: ${{ matrix.configuration }}
 
     - name: Create the app package
-      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /bl:package.binlog # Create binary log
+      run: msbuild $env:Wap_Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /bl:package.binlog
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x86|x64
@@ -53,7 +53,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BuildLogs
-        path: "*.binlog" # Upload binary logs
+        path: "*.binlog"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
