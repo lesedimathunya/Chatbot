@@ -16,6 +16,8 @@ jobs:
 
     env:
       Solution_Name: Chatbot.sln
+      Wap_Project_Path: ./Chatbot/Chatbot.Package/Chatbot.Package.wapproj # Replace with your actual path
+      Wap_Project_Directory: ./Chatbot/Chatbot.Package/ # Replace with your actual path.
 
     steps:
     - name: Checkout
@@ -52,3 +54,4 @@ jobs:
       with:
         name: MSIX Package
         path: ${{ env.Wap_Project_Directory }}\AppPackages
+        
