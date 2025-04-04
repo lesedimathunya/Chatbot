@@ -25,6 +25,9 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: List directory contents
+      run: ls -R
+
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
@@ -37,7 +40,7 @@ jobs:
       run: dotnet test
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration /bl:restore.binlog
+      run: dotnet restore $env:Solution_Name # Changed to dotnet restore
       env:
         Configuration: ${{ matrix.configuration }}
 
